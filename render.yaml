@@ -1,0 +1,19 @@
+services:
+  - type: web
+    name: discord-status-bot
+    env: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: python bot.py
+    envVars:
+      - key: DISCORD_TOKEN
+        sync: false
+      - key: OWNER_ID
+        sync: false
+      - key: IMAGE_URL
+        sync: false
+      - key: IMAGE_URL_SLEEP
+        sync: false
+      - key: TICKET_CHANNEL_ID
+        sync: false
+      - key: STATUS_LOG_CHANNEL_ID
+        sync: false

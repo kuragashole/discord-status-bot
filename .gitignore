@@ -1,0 +1,16 @@
+.env
+.env.local
+.env.*.local
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+venv/
+env/
+ENV/
+.venv
+status_messages.json
+*.log
+.DS_Store
+Thumbs.db
