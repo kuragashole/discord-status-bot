@@ -291,8 +291,9 @@ async def start_status(interaction: discord.Interaction, mode: str):
 
                     log_view = StatusView(status_type=mode)
 
-                    # Send the new status panel with @everyone tag
-                    log_message = await log_channel.send(content="@everyone", embed=log_embed, view=log_view, file=log_file_to_send)
+                    # Send the new status panel with @everyone tag only for work mode
+                    content = "@everyone" if mode == "work" else None
+                    log_message = await log_channel.send(content=content, embed=log_embed, view=log_view, file=log_file_to_send)
                     status_log_messages[log_channel_id_str] = log_message.id
                     print(f"✅ Full status panel sent to log channel: {log_channel.name}")
             except Exception as e:
