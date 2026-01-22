@@ -85,7 +85,7 @@ async def on_ready():
         
         print('\n⚠️  IMPORTANT: If commands don\'t work, wait 1-2 minutes for synchronization!')
         print('⚠️  Old commands with Russian descriptions will be removed automatically')
-        print('✅ Keep-alive server is running on port 8080')
+        print('✅ Keep-alive server is running on port 5000')
     except Exception as e:
         print(f'❌ Error syncing commands: {e}')
         import traceback

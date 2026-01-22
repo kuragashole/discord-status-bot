@@ -12,7 +12,7 @@ def home():
     return "✅ Discord Status Bot is alive and running!"
 
 def run():
-    app.run(host='0.0.0.0', port=8080)
+    app.run(host='0.0.0.0', port=5000)
 
 def keep_alive():
     """Запускает Flask сервер в отдельном потоке"""
