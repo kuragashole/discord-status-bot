@@ -257,7 +257,7 @@ async def start_status(interaction: discord.Interaction, mode: str):
         )
 
         # Send full status panel to log channel and delete old one
-        if STATUS_LOG_CHANNEL_ID and STATUS_LOG_CHANNEL_ID != '0':
+        if mode == "work" and STATUS_LOG_CHANNEL_ID and STATUS_LOG_CHANNEL_ID != '0':
             try:
                 log_channel = bot.get_channel(int(STATUS_LOG_CHANNEL_ID))
                 if log_channel:
