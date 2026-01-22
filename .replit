@@ -15,20 +15,19 @@ author = "agent"
 
 [[workflows.workflow.tasks]]
 task = "workflow.run"
-args = "Discord Bot (Stopped)"
+args = "Discord Bot"
 
 [[workflows.workflow]]
-name = "Discord Bot (Stopped)"
+name = "Discord Bot"
 author = "agent"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
-args = """
-# Bot stopped by user. Run this to start: python bot_replit.py
-exit 0"""
+args = "python bot_replit.py"
+waitForPort = 5000
 
 [workflows.workflow.metadata]
-outputType = "console"
+outputType = "webview"
 
 [[ports]]
 localPort = 5000
