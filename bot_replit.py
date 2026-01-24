@@ -29,32 +29,31 @@ bot = commands.Bot(command_prefix='!', intents=intents)
 
 # File for saving status messages
 STATUS_FILE = 'status_messages.json'
+LOG_MESSAGES_FILE = 'log_messages.json'
 
-def load_status_messages():
-    """Load status messages from file"""
-    if os.path.exists(STATUS_FILE):
+def load_json_file(filename):
+    """Load data from json file"""
+    if os.path.exists(filename):
         try:
-            with open(STATUS_FILE, 'r', encoding='utf-8') as f:
+            with open(filename, 'r', encoding='utf-8') as f:
                 return json.load(f)
         except:
             return {}
     return {}
 
-def save_status_messages():
-    """Save status messages to file"""
+def save_json_file(filename, data):
+    """Save data to json file"""
     try:
-        with open(STATUS_FILE, 'w', encoding='utf-8') as f:
-            json.dump(status_messages, f, indent=2)
+        with open(filename, 'w', encoding='utf-8') as f:
+            json.dump(data, f, indent=2)
     except Exception as e:
-        print(f"Error saving status messages: {e}")
+        print(f"Error saving {filename}: {e}")
 
 # Storage for status messages
-# Format: {channel_id: {"status_message_id": id, "image_message_id": id}}
-status_messages = load_status_messages()
+status_messages = load_json_file(STATUS_FILE)
 
 # Storage for messages in status log channel
-# Format: {channel_id: log_message_id}
-status_log_messages = {}
+status_log_messages = load_json_file(LOG_MESSAGES_FILE)
 
 @bot.event
 async def on_ready():
@@ -166,7 +165,7 @@ async def setup_status(interaction: discord.Interaction):
             message = await interaction.channel.send(embed=embed, view=view)
 
         status_messages[str(interaction.channel.id)] = {"status_message_id": str(message.id)}
-        save_status_messages()
+        save_json_file(STATUS_FILE, status_messages)
         
         await interaction.followup.send("✅ Status message created!", ephemeral=True)
         print(f"✅ Status message created in channel {interaction.channel.id}")
@@ -295,6 +294,7 @@ async def start_status(interaction: discord.Interaction, mode: str):
                     content = "@everyone" if mode == "work" else None
                     log_message = await log_channel.send(content=content, embed=log_embed, view=log_view, file=log_file_to_send)
                     status_log_messages[log_channel_id_str] = log_message.id
+                    save_json_file(LOG_MESSAGES_FILE, status_log_messages)
                     print(f"✅ Full status panel sent to log channel: {log_channel.name}")
             except Exception as e:
                 print(f"⚠️  Error sending full status panel to log channel: {e}")
