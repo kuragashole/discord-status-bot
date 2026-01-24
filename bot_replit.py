@@ -256,11 +256,13 @@ async def start_status(interaction: discord.Interaction, mode: str):
         )
 
         # Send full status panel to log channel and delete old one
-        if mode == "work" and STATUS_LOG_CHANNEL_ID and STATUS_LOG_CHANNEL_ID != '0':
+        if STATUS_LOG_CHANNEL_ID and STATUS_LOG_CHANNEL_ID != '0':
             try:
                 log_channel = bot.get_channel(int(STATUS_LOG_CHANNEL_ID))
                 if log_channel:
                     log_channel_id_str = str(log_channel.id)
+                    
+                    # Always try to delete the old message if it exists in our records
                     if log_channel_id_str in status_log_messages:
                         try:
                             old_log_message_id = status_log_messages[log_channel_id_str]
@@ -271,33 +273,40 @@ async def start_status(interaction: discord.Interaction, mode: str):
                             pass
                         except Exception as e:
                             print(f"⚠️  Error deleting old log message: {e}")
+                        
+                        # Clear from storage after deletion attempt
+                        del status_log_messages[log_channel_id_str]
+                        save_json_file(LOG_MESSAGES_FILE, status_log_messages)
 
-                    # Create the full status panel for the log channel
-                    log_embed = discord.Embed(
-                        title="📊 Status",
-                        description=f"{welcome_text}\n\n{('🟢 Active' if mode == 'work' else '🔴 Sleep')}",
-                        color=discord.Color.green() if mode == "work" else discord.Color.red()
-                    )
-                    
-                    log_file_to_send = None
-                    if os.path.exists(current_image_url):
-                        log_file_ext = os.path.splitext(current_image_url)[1].lower() or '.png'
-                        log_filename = f"status_image_{mode}{log_file_ext}"
-                        log_file_to_send = discord.File(current_image_url, filename=log_filename)
-                        log_embed.set_image(url=f"attachment://{log_filename}")
+                    # ONLY send a new message if mode is "work"
+                    if mode == "work":
+                        # Create the full status panel for the log channel
+                        log_embed = discord.Embed(
+                            title="📊 Status",
+                            description=f"{welcome_text}\n\n🟢 Active",
+                            color=discord.Color.green()
+                        )
+                        
+                        log_file_to_send = None
+                        if os.path.exists(current_image_url):
+                            log_file_ext = os.path.splitext(current_image_url)[1].lower() or '.png'
+                            log_filename = f"status_image_work{log_file_ext}"
+                            log_file_to_send = discord.File(current_image_url, filename=log_filename)
+                            log_embed.set_image(url=f"attachment://{log_filename}")
+                        else:
+                            log_embed.set_image(url=current_image_url)
+
+                        log_view = StatusView(status_type="work")
+
+                        # Send the new status panel with @everyone tag
+                        log_message = await log_channel.send(content="@everyone", embed=log_embed, view=log_view, file=log_file_to_send)
+                        status_log_messages[log_channel_id_str] = log_message.id
+                        save_json_file(LOG_MESSAGES_FILE, status_log_messages)
+                        print(f"✅ Full status panel sent to log channel: {log_channel.name}")
                     else:
-                        log_embed.set_image(url=current_image_url)
-
-                    log_view = StatusView(status_type=mode)
-
-                    # Send the new status panel with @everyone tag only for work mode
-                    content = "@everyone" if mode == "work" else None
-                    log_message = await log_channel.send(content=content, embed=log_embed, view=log_view, file=log_file_to_send)
-                    status_log_messages[log_channel_id_str] = log_message.id
-                    save_json_file(LOG_MESSAGES_FILE, status_log_messages)
-                    print(f"✅ Full status panel sent to log channel: {log_channel.name}")
+                        print(f"ℹ️ Mode is sleep, notification skipped and old message deleted.")
             except Exception as e:
-                print(f"⚠️  Error sending full status panel to log channel: {e}")
+                print(f"⚠️  Error handling log channel: {e}")
         
     except Exception as e:
         print(f"❌ Error changing status: {e}")
