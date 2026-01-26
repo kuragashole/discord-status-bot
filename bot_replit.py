@@ -178,6 +178,29 @@ async def setup_status(interaction: discord.Interaction):
             await interaction.response.send_message(error_msg, ephemeral=True)
 
 
+@bot.tree.command(name="pay", description="Send PayPal payment instructions")
+async def pay_command(interaction: discord.Interaction):
+    """Command to send PayPal instructions"""
+    if not is_owner(interaction):
+        await interaction.response.send_message("❌ Only the bot owner can use this command!", ephemeral=True)
+        return
+
+    pay_message = (
+        "PAYPAL F/F\n\n"
+        "`korotaevao@mail.kz`\n\n"
+        "just click and cope mail\n\n"
+        'CHOOSE "friend family" (**NO COMMENTS ON THE TRANSLATION**)\n'
+        "**NO COMMENTS**\n\n"
+        "IMPORTANT NOTE!!!\n"
+        "IF YOU HAD TRANSFERRED BY REGULAR TRANSFER, AND NOT FOR FRIENDS AND FAMILY, "
+        "THEN YOU WILL RECEIVE YOUR PURCHASE ONLY AFTER 14 DAYS.\n"
+        "DO THE TRANSLATION ONLY FOR FRIENDS AND FAMILY\n\n"
+        "After send me pic when i can see fee line"
+    )
+    
+    await interaction.response.send_message(pay_message)
+
+
 @bot.tree.command(name="start", description="Change status")
 @app_commands.describe(mode="Mode: work or sleep")
 @app_commands.default_permissions(administrator=True)
